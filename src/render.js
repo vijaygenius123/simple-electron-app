@@ -10,6 +10,8 @@ const videoSelectionBtn = document.getElementById('videoSelectionBtn')
 
 videoSelectionBtn.onclick = getVideoSources;
 
+let mediaRecorder;
+const recordedChunks = [];
 
 async function getVideoSources() {
     const inputSources = await desktopCapturer.getSources({
@@ -50,4 +52,22 @@ async function selectSource(source) {
     videoElement.srcObject = stream;
     videoElement.play();
 
+
+    const options = { mimeType: 'video/webm; codecs=vp9' };
+    mediaRecorder = new MediaRecorder(stream, options);
+
+
+    mediaRecorder.ondataavailable = handleDataAvailable;
+    mediaRecorder.onstop = handleStop;
+
+}
+
+function handleDataAvailable(e) {
+    console.log('Data available');
+
+    recordedChunks.push(e.data);
+}
+
+async function handleStop(e) {
+    console.log('Stopped');
 }
