@@ -1,5 +1,5 @@
 const { desktopCapturer, remote } = require('electron');
-const { Menu } = remote;
+const { Menu, dialog } = remote;
 const { writeFile } = require('fs')
 const videoElement = document.getElementById('video')
 
@@ -12,6 +12,19 @@ videoSelectionBtn.onclick = getVideoSources;
 
 let mediaRecorder;
 const recordedChunks = [];
+
+startBtn.onclick = e => {
+    mediaRecorder.start();
+    startBtn.classList.add('is-danger');
+    startBtn.innerText = 'Recording';
+};
+
+
+stopBtn.onclick = e => {
+    mediaRecorder.stop();
+    startBtn.classList.remove('is-danger');
+    startBtn.innerText = 'Start';
+};
 
 async function getVideoSources() {
     const inputSources = await desktopCapturer.getSources({
@@ -69,7 +82,7 @@ function handleDataAvailable(e) {
 }
 
 async function handleStop(e) {
-    const blob = new Blob([recordedChunks], { type: 'video/webm; codecs=vp9' })
+    const blob = new Blob(recordedChunks, { type: 'video/webm; codecs=vp9' })
 
     const buffer = Buffer.from(await blob.arrayBuffer());
 
